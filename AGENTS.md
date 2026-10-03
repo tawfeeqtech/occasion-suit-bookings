@@ -2,7 +2,7 @@
 
 ## Project Overview
 
-Multi-tenant SaaS for wedding suit rental shops. Internal-only (no customer-facing portal). Staff use a Telegram bot (Arabic voice notes) to create bookings; owners use a web admin dashboard for inventory, financials, and analytics.
+Multi-tenant SaaS for wedding suit rental shops. Internal-only (no customer-facing portal). Staff use a Telegram bot (Arabic voice notes) to create bookings; the Shop Owner uses a web dashboard for inventory, financials, and analytics; the System Admin manages the platform-level tenants and subscriptions.
 
 **Stack:** Laravel 13 + Filament (Arabic/RTL) + PostgreSQL + n8n (self-hosted) + Groq Whisper + OpenAI GPT-4o-mini
 
@@ -11,7 +11,7 @@ Multi-tenant SaaS for wedding suit rental shops. Internal-only (no customer-faci
 - **Multi-tenancy from day one.** Every table has `tenant_id`. All Eloquent queries use a global scope. Never write a query without tenant scoping.
 - **PostgreSQL only** (not SQLite). Row-level locking (`SELECT ... FOR UPDATE`) prevents double-booking. JSONB columns store dynamic accessory bundles.
 - **No payment gateway integration.** Payments are manual record-keeping only (cash, PalPay, Jawwal Pay, bank transfer).
-- **No customer-facing features.** All users are shop owners or staff.
+- **No customer-facing features.** Tenant users are either the Shop Owner or Staff; the System Admin is a separate platform-level role.
 - **National ID cards are never scanned/stored.** Only a status flag (`held`/`released`) + text notes.
 - **Telegram bot is 1-on-1 DM only.** Auth via `user_id` whitelist per tenant. No groups/channels.
 
@@ -67,10 +67,17 @@ Voice note → Groq Whisper (whisper-large-v3) → Arabic text
 
 ## Roles & Permissions
 
-| Role | Capabilities |
-|---|---|
-| **Owner** | Full admin: inventory, financials, reports, staff management, Telegram whitelist, settings |
-| **Staff** | Create bookings (voice/text), view availability, process returns, view daily schedule |
+The project uses exactly three role categories, each with a distinct scope:
+
+- **Shop Owner**: tenant-level owner for one shop. Full control over inventory, financials, staff management, settings, and Telegram whitelist for that shop.
+- **Staff**: tenant-level operator. Creates bookings, checks availability, processes returns, and views the daily schedule for that shop only.
+- **System Admin**: platform-level administrator. Manages tenants, subscriptions, and the central platform dashboard; does not manage a shop's daily operations.
+
+| Role | Scope | Capabilities |
+|---|---|---|
+| **Shop Owner** | Single tenant/shop | Full admin: inventory, financials, reports, staff management, Telegram whitelist, settings |
+| **Staff** | Single tenant/shop | Create bookings (voice/text), view availability, process returns, view daily schedule |
+| **System Admin** | Platform-wide | Manage shops, subscriptions, tenant records, and central platform administration |
 
 ## Non-Negotiable Constraints
 

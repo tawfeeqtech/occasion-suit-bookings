@@ -11,8 +11,8 @@
 | **Version** | MVP v1.0 |
 | **Problem** | Manual reservation conflicts, buffer-time scheduling errors, and tedious data entry for wedding suit rental shops |
 | **Solution** | Voice-driven, multi-tenant SaaS booking system with automated availability checks, dynamic bundle management, and financial tracking |
-| **Target Users** | Shop owners and in-store staff (internal only) |
-| **Platforms** | Telegram bot (staff) + responsive web admin (owner) |
+| **Target Users** | System Admin, Shop Owner, and Staff (internal only) |
+| **Platforms** | Telegram bot (Staff) + responsive web dashboard (Shop Owner and System Admin) |
 | **Timeline** | 3–4 weeks to pilot MVP |
 | **Budget** | <$30/month infrastructure |
 
@@ -20,12 +20,12 @@
 
 ## 2. User Stories
 
-### 2.1 Shop Owner (Admin)
+### 2.1 Shop Owner
 
 | ID | User Story | Priority |
 |---|---|---|
 | US-O-01 | As a shop owner, I want to log in to the web dashboard with email/password and optional 2FA so that only authorized users access my shop's data | P0 |
-| US-O-02 | As a shop owner, I want to manage staff accounts and assign roles (staff vs. admin) so that I control who can perform which actions | P0 |
+| US-O-02 | As a shop owner, I want to manage staff accounts and assign roles (staff vs. shop owner) so that I control who can perform which actions | P0 |
 | US-O-03 | As a shop owner, I want to configure my shop's suit inventory with dynamic bundles (jacket, trousers, shirt, vest, shoes, belt, tie, lapel pin) and custom fields so that the system matches my shop's unique catalog | P0 |
 | US-O-04 | As a shop owner, I want to set configurable cleaning/buffer turnaround times per item so that suits cannot be rebooked before they are ready | P0 |
 | US-O-05 | As a shop owner, I want to view financial reports (revenue, outstanding balances, deposits collected) so that I can track business performance | P1 |
@@ -33,7 +33,14 @@
 | US-O-07 | As a shop owner, I want to view a calendar of all bookings, returns, and item availability so that I can plan operations | P1 |
 | US-O-08 | As a shop owner, I want to configure custom pricing rules (base rental, alterations, accessories) so that the system calculates totals correctly | P1 |
 
-### 2.2 Staff Member (Operator)
+### 2.2 System Admin
+
+| ID | User Story | Priority |
+|---|---|---|
+| US-PA-01 | As a System Admin, I want to manage shop records and their subscription records from a central platform dashboard so that I can administer tenants independently of shop-owner accounts | P0 |
+| US-PA-02 | As a System Admin, I want each shop's subscription to use a fixed monthly fee so that subscription pricing is consistent per shop; the fee amount remains to be determined | P0 |
+
+### 2.3 Staff Member (Operator)
 
 | ID | User Story | Priority |
 |---|---|---|
@@ -48,7 +55,7 @@
 | US-S-09 | As a staff member, I want to record partial payments and track remaining balances so that I know what is still owed | P1 |
 | US-S-10 | As a staff member, I want to be rejected by the bot if my Telegram user_id is not whitelisted so that unauthorized users cannot access the system | P0 |
 
-### 2.3 System (Automated)
+### 2.4 System (Automated)
 
 | ID | User Story | Priority |
 |---|---|---|
@@ -67,20 +74,20 @@
 ```gherkin
 Feature: Web Admin Authentication
 
-  Scenario: Owner logs in with valid credentials
-    Given the owner is on the login page
+  Scenario: Shop Owner logs in with valid credentials
+    Given the Shop Owner is on the login page
     When they enter a valid email and password
     Then they are redirected to the dashboard
     And their tenant_id is resolved from their account
 
-  Scenario: Owner enables 2FA
-    Given the owner is logged in
+  Scenario: Shop Owner enables 2FA
+    Given the Shop Owner is logged in
     When they navigate to security settings and enable 2FA
     Then a QR code is displayed for authenticator app setup
     And subsequent logins require a valid TOTP code
 
   Scenario: Invalid login attempt
-    Given the owner is on the login page
+    Given the Shop Owner is on the login page
     When they enter an invalid email or password
     Then an error message is displayed
     And no session is created
@@ -98,6 +105,15 @@ Feature: Telegram Bot Whitelist Authentication
     When they send a message to the bot
     Then the bot replies with an authorization error
     And no data is processed or returned
+
+Feature: System Admin Platform Dashboard
+
+  Scenario: System Admin manages shops and subscriptions
+    Given an authenticated System Admin
+    When they open the central platform dashboard
+    Then they can view and manage shop records and their subscription records
+    And subscription pricing is recorded as a fixed monthly fee per shop
+    And the Shop Owner cannot access other shops' records through this dashboard
 ```
 
 ### 3.2 Voice-Driven Booking Flow
