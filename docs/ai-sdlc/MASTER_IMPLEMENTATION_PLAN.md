@@ -106,14 +106,14 @@ graph TD
 ---
 
 ### المرحلة 4: معالجة المرتجعات، فحص القطع، وتقدير الغرامات اليدوي (SPEC-006 & SPEC-005)
-- [ ] تطوير `ReturnService`:
+- [x] تطوير `ReturnService`:
   - استعراض كافة عناصر الحجز للتحقق منها.
   - تسجيل حالة كل قطعة: `clean_pass` (سليم)، `damaged` (تالف)، `missing` (مفقود).
   - في حال وجود تلف أو فقدان: إدخال مبلغ الغرامة يدوياً وسبب التقدير، وتحويل الحجز إلى `damage_pending`.
   - القطع السليمة المرتجعة تتحول تلقائياً إلى حالة `cleaning`.
   - حظر فك حجز بطاقة الهوية (`collateral_records`) إذا كان هناك رصيد إيجار متبقٍ أو غرامة غير مسددة.
-- [ ] فك حجز الهوية (`POST /api/v1/bookings/{id}/collateral/release` أو عبر لوحة التحكم) بعد سداد كامل المستحقات.
-- [ ] جدولة تحويل القطع المنتهية فترة تنظيفها إلى `available` عبر Artisan Command مجدول (`php artisan buffer:release-clean-items`).
+- [x] فك حجز الهوية (`POST /api/v1/bookings/{id}/collateral/release` أو عبر لوحة التحكم) بعد سداد كامل المستحقات.
+- [x] جدولة تحويل القطع المنتهية فترة تنظيفها إلى `available` عبر Artisan Command مجدول (`php artisan buffer:release-clean-items`).
 
 ---
 
