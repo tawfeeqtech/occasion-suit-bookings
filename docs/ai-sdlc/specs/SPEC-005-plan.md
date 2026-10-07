@@ -20,7 +20,7 @@ Implement Laravel maintenance records and state transitions, tenant-configured c
 1. Add tenant-scoped maintenance schema/model, status transitions, foreign keys, and the composite ready-work index from the SPEC.
 2. Implement return-to-cleaning behavior using the tenant's single `buffer_hours` setting and persist `expected_ready_at` consistently.
 3. Extend availability logic to return a conflict and exact readiness timestamp during cleaning/maintenance; also calculate readiness directly so delayed scheduling cannot cause stale blocking.
-4. Implement the release command to process only due cleaning rows, transition item and maintenance state atomically, and attribute system audit events explicitly.
+4. Implement the release command (`php artisan buffer:release-clean-items`) to process only due cleaning rows, transition item and maintenance state atomically, and attribute system audit events explicitly.
 5. Register the 15-minute schedule using project conventions and prevent duplicate/overlapping releases safely.
 6. Expose readiness values to the dashboard resource and add tests for time boundaries, extensions, tenant settings, and scheduler behavior.
 

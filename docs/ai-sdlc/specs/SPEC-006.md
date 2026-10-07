@@ -113,7 +113,7 @@ CREATE TABLE collateral_records (
 ## 5. Negative Boundaries ("What Should NOT Happen")
 - The system MUST NOT release an ID while a rental balance is unpaid or a penalty remains unpaid without an owner-approved, audited waiver ([return-inspection-workflow.md:L33](file:///d:/mind-ai/occasion-suit-bookings/intent/return-inspection-workflow.md#L33)).
 - The system MUST NOT refund deposits as cash collateral; advance payments are strictly credited against rental charges ([return-inspection-workflow.md:L52](file:///d:/mind-ai/occasion-suit-bookings/intent/return-inspection-workflow.md#L52)).
-- National ID numbers or details must not be wiped upon release; only `status` updates to `released` with timestamp and user ID ([return-inspection-workflow.md:L41](file:///d:/mind-ai/occasion-suit-bookings/intent/return-inspection-workflow.md#L41)).
+- National ID collateral records must not be deleted upon release; only `status` updates to `released` with timestamp and user ID ([return-inspection-workflow.md:L41](file:///d:/mind-ai/occasion-suit-bookings/intent/return-inspection-workflow.md#L41)).
 
 ---
 

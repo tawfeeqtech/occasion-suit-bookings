@@ -11,7 +11,7 @@ This document is the normative visual and interaction reference for the SuitRent
 
 ## 1. Product Experience
 
-SuitRent should feel like the operations room of a premium tailoring house: dark textile surfaces, restrained satin-gold accents, precise tables, and calm transaction feedback. Luxury comes from material contrast, typography, spacing, and disciplined detail, not ornamental frames or decorative effects.
+SuitRent provides an elegant operations experience for premium tailoring houses: refined surfaces, restrained satin-gold accents, precise tables, and calm transaction feedback. The interface supports both a signature Dark Luxury Mode (default) and a clean Light Mode for bright daytime store environments. Luxury comes from material contrast, typography, spacing, and disciplined detail.
 
 The interface must optimize repeated work: fast inventory entry, accurate date and amount entry, clear availability, safe return inspection, and immediate visibility of collateral state. Primary actions and current operational status must remain easy to scan during busy shop hours.
 
@@ -83,11 +83,11 @@ Status background, text, and border are paired tokens. Never use the saturated a
 
 | Token | Font stack | Use |
 |---|---|---|
-| `font.arabic` | `"IBM Plex Sans Arabic", "Cairo", sans-serif` | Arabic UI, headings, forms, tables, navigation |
+| `font.arabic` | `"IBM Plex Sans Arabic", "Cairo", "Tajawal", sans-serif` | Arabic UI, headings, forms, tables, navigation |
 | `font.latin` | `Inter, "IBM Plex Sans Arabic", sans-serif` | Latin text, mixed-language labels, English identifiers |
 | `font.mono` | `"JetBrains Mono", "SFMono-Regular", Consolas, monospace` | Barcode values, UUID fragments, booking references, technical IDs |
 
-Load IBM Plex Sans Arabic as the primary family. Cairo is a fallback only. Inter is used for Latin numerals when loaded; all numeric text must remain legible if it falls back to the Arabic family. Do not use a display serif for operational data.
+Approved Arabic fonts include IBM Plex Sans Arabic, Cairo, and Tajawal. Inter is used for Latin numerals when loaded; all numeric text must remain legible if it falls back to the Arabic family. Do not use a display serif for operational data.
 
 ### Type scale
 
@@ -349,7 +349,7 @@ Map these tokens into the Filament panel theme and the Tailwind CSS 4 theme laye
 
 ```css
 :root {
-    color-scheme: dark;
+    color-scheme: dark light;
     --sr-canvas: #090D16;
     --sr-shell: #0B1220;
     --sr-surface-1: #0F172A;
@@ -368,5 +368,18 @@ Map these tokens into the Filament panel theme and the Tailwind CSS 4 theme laye
     --sr-radius-control: 6px;
     --sr-radius-card: 8px;
     --sr-focus-ring: 0 0 0 2px rgba(245, 158, 11, 0.32);
+}
+
+.filament-theme-light, [data-theme="light"] {
+    --sr-canvas: #F8FAFC;
+    --sr-shell: #FFFFFF;
+    --sr-surface-1: #FFFFFF;
+    --sr-surface-2: #F1F5F9;
+    --sr-surface-3: #E2E8F0;
+    --sr-border-subtle: #E2E8F0;
+    --sr-border-default: #CBD5E1;
+    --sr-text-primary: #0F172A;
+    --sr-text-secondary: #475569;
+    --sr-text-muted: #64748B;
 }
 ```

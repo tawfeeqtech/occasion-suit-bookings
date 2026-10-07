@@ -6,7 +6,7 @@
 - Approval: Approved
 
 ## Goal and Scope
-Implement Laravel web authentication (email + password only, no 2FA TOTP), role-based authorization policies for Shop Owner and Staff, and Telegram staff verification by matching `telegram_user_id` against tenant staff records.
+Implement Laravel web authentication (email + password only, no 2FA TOTP), role-based authorization policies for System Admin, Shop Owner and Staff, and Telegram staff verification by matching `telegram_user_id` against tenant staff records.
 
 ## External Workstream (Excluded)
 - Telegram bot, Telegram Bot API webhook, interactive emulator/simulator, and audio handling (all handled exclusively in n8n).
@@ -14,14 +14,14 @@ Implement Laravel web authentication (email + password only, no 2FA TOTP), role-
 ## Constraints
 - Password-only authentication for Web Admin / Filament.
 - Staff telegram ID matching middleware for API endpoints.
-- Role checks: `owner` (full access), `staff` (operational only; financials and settings forbidden).
+- Role checks: `system_admin` (platform level: manage shops & subscriptions), `owner` (full shop access), `staff` (operational only; financials and settings forbidden).
 - Active flag checking: inactive users cannot log in or authenticate via API.
 
 ## Implementation Steps
-1. Create `users` migration with UUID, `tenant_id`, `role`, `telegram_user_id`, `is_active`.
+1. Create `users` migration with UUID, `tenant_id` (nullable for system_admin), `role` (system_admin, owner, staff), `telegram_user_id`, `is_active`.
 2. Configure authentication guards and password hashing.
 3. Implement `TelegramStaffMiddleware` for API routes to validate `telegram_user_id` and attach current tenant/staff context.
-4. Implement authorization policies (`BookingPolicy`, `ReportPolicy`, `UserPolicy`, `ItemPolicy`) to restrict Staff from financials, settings, and staff deletion.
+4. Implement authorization policies (`BookingPolicy`, `ReportPolicy`, `UserPolicy`, `ItemPolicy`, `TenantPolicy`) to restrict Staff from financials, settings, and staff deletion, and restrict tenant operations to tenant context.
 5. Create Filament resources for user/staff management including assigning `telegram_user_id`.
 6. Add unit and feature tests: `AuthenticationFeatureTest`, `TelegramWhitelistAuthTest`, `AuthorizationStaffPolicyTest`.
 

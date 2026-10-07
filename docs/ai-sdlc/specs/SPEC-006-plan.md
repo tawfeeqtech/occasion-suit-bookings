@@ -12,7 +12,7 @@ Implement Laravel return inspection for all items on a booking, manual damage/mi
 - Telegram return commands, voice-based inspection, n8n workflows, and external notifications. Return entry is through Laravel API/admin application surfaces only.
 
 ## Open Questions and Constraints
-- SPEC-006's payload requires a manual `penalty_reason`, but the listed schema only has `penalty_fee`; the schema also lacks an explicit waiver representation. Decide whether these belong on booking-item assessment fields or a separate penalty/waiver record before migrations.
+- **Resolved penalty & waiver persistence:** `booking_items` explicitly includes `penalty_fee`, `penalty_reason`, and `is_waived BOOLEAN DEFAULT FALSE` to store the assessment and owner waiver directly on the assessed item record.
 - SPEC-008 audit persistence must be established before return/waiver/release transactions can satisfy the requirement that audit failure rolls back the parent change.
 - Never store ID-card scans/images or raw ID numbers. Collateral is a status record with permitted text notes only, per `AGENTS.md`.
 - Return processing depends on the item/booking schema and cleaning lifecycle from SPEC-004 and SPEC-005.

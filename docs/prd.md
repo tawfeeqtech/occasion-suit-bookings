@@ -24,7 +24,7 @@
 
 | ID | User Story | Priority |
 |---|---|---|
-| US-O-01 | As a shop owner, I want to log in to the web dashboard with email/password and optional 2FA so that only authorized users access my shop's data | P0 |
+| US-O-01 | As a shop owner, I want to log in to the web dashboard with email/password so that only authorized users access my shop's data | P0 |
 | US-O-02 | As a shop owner, I want to manage staff accounts and assign roles (staff vs. shop owner) so that I control who can perform which actions | P0 |
 | US-O-03 | As a shop owner, I want to configure my shop's suit inventory with dynamic bundles (jacket, trousers, shirt, vest, shoes, belt, tie, lapel pin) and custom fields so that the system matches my shop's unique catalog | P0 |
 | US-O-04 | As a shop owner, I want to set configurable cleaning/buffer turnaround times per item so that suits cannot be rebooked before they are ready | P0 |
@@ -79,12 +79,6 @@ Feature: Web Admin Authentication
     When they enter a valid email and password
     Then they are redirected to the dashboard
     And their tenant_id is resolved from their account
-
-  Scenario: Shop Owner enables 2FA
-    Given the Shop Owner is logged in
-    When they navigate to security settings and enable 2FA
-    Then a QR code is displayed for authenticator app setup
-    And subsequent logins require a valid TOTP code
 
   Scenario: Invalid login attempt
     Given the Shop Owner is on the login page
@@ -369,8 +363,8 @@ Feature: System Performance
 │  │                  Laravel + Filament                        ││
 │  │                                                             ││
 │  │  ┌─────────────┐  ┌─────────────┐  ┌─────────────────────┐ ││
-│  │  │ Filament    │  │ Laravel     │  │ Laravel Fortify     │ ││
-│  │  │ Admin Panel │  │ REST API    │  │ (Auth + 2FA)        │ ││
+│  │  │ Filament    │  │ Laravel     │  │ Laravel Auth        │ ││
+│  │  │ Admin Panel │  │ REST API    │  │ (Session-based)     │ ││
 │  │  │ (RTL/Arabic)│  │ (Business   │  │                     │ ││
 │  │  │             │  │  Logic)     │  │                     │ ││
 │  │  └─────────────┘  └──────┬──────┘  └─────────────────────┘ ││
@@ -435,12 +429,11 @@ CREATE TABLE tenants (
 -- Users & Auth
 CREATE TABLE users (
     id UUID PRIMARY KEY,
-    tenant_id UUID NOT NULL REFERENCES tenants(id),
+    tenant_id UUID REFERENCES tenants(id), -- NULL for platform system_admin
     name VARCHAR(255) NOT NULL,
     email VARCHAR(255) UNIQUE NOT NULL,
     password_hash VARCHAR(255) NOT NULL,
-    role VARCHAR(50) NOT NULL,          -- 'owner' | 'staff'
-    two_factor_secret VARCHAR(255),
+    role VARCHAR(50) NOT NULL,          -- 'system_admin' | 'owner' | 'staff'
     telegram_user_id BIGINT,            -- nullable, for bot whitelist
     is_active BOOLEAN DEFAULT TRUE,
     created_at TIMESTAMPTZ DEFAULT NOW()
@@ -465,7 +458,6 @@ CREATE TABLE bookings (
     tenant_id UUID NOT NULL REFERENCES tenants(id),
     customer_name VARCHAR(255) NOT NULL,
     customer_phone VARCHAR(50) NOT NULL,
-    customer_id_number VARCHAR(100),    -- National ID number (text only, no images)
     pickup_date TIMESTAMPTZ NOT NULL,
     event_date TIMESTAMPTZ,             -- optional wedding/event date
     return_date TIMESTAMPTZ NOT NULL,
@@ -488,7 +480,9 @@ CREATE TABLE booking_items (
     is_primary BOOLEAN DEFAULT FALSE,   -- true for main suit
     alteration_notes TEXT,
     return_status VARCHAR(50),          -- 'clean_pass' | 'damaged' | 'missing' | NULL
-    penalty_fee DECIMAL(10,2) DEFAULT 0,
+    penalty_fee DECIMAL(10,2) DEFAULT 0.00,
+    penalty_reason TEXT,
+    is_waived BOOLEAN DEFAULT FALSE,
     created_at TIMESTAMPTZ DEFAULT NOW()
 );
 
@@ -502,6 +496,19 @@ CREATE TABLE collateral_records (
     held_at TIMESTAMPTZ DEFAULT NOW(),
     released_at TIMESTAMPTZ,
     released_by UUID REFERENCES users(id)
+);
+
+-- Payments & Financial Ledger
+CREATE TABLE booking_payments (
+    id UUID PRIMARY KEY,
+    tenant_id UUID NOT NULL REFERENCES tenants(id) ON DELETE CASCADE,
+    booking_id UUID NOT NULL REFERENCES bookings(id) ON DELETE CASCADE,
+    amount DECIMAL(10,2) NOT NULL,
+    type VARCHAR(50) NOT NULL,          -- 'advance' | 'final_payment' | 'penalty'
+    method VARCHAR(50) NOT NULL,        -- 'cash' | 'palpay' | 'jawwal_pay' | 'bank_transfer'
+    reference_number VARCHAR(100),
+    recorded_by UUID REFERENCES users(id),
+    created_at TIMESTAMPTZ DEFAULT NOW()
 );
 
 -- Cleaning Buffer Tracking
@@ -539,7 +546,6 @@ CREATE INDEX idx_audit_logs_tenant_created ON audit_logs(tenant_id, created_at D
 
 | Method | Endpoint | Description |
 |---|---|---|
-| POST | `/api/v1/telegram/webhook` | n8n → Laravel: receive parsed booking data |
 | POST | `/api/v1/availability/check` | Check item availability for date range |
 | POST | `/api/v1/bookings` | Create booking (ACID transaction) |
 | GET | `/api/v1/bookings` | List bookings (tenant-scoped) |
@@ -573,7 +579,7 @@ CREATE INDEX idx_audit_logs_tenant_created ON audit_logs(tenant_id, created_at D
 | Layer | Mechanism |
 |---|---|
 | **Transport** | HTTPS/TLS everywhere (Nginx + Let's Encrypt) |
-| **Web Auth** | Laravel Fortify (email/password + optional TOTP 2FA) |
+| **Web Auth** | Laravel Session Auth (email/password) |
 | **Bot Auth** | Telegram user_id whitelist per tenant |
 | **API Auth** | Laravel Sanctum tokens (scoped per tenant) |
 | **Data Isolation** | Global scope on all Eloquent models (`tenant_id`) |
@@ -597,8 +603,8 @@ services:
     environment:
       - DB_HOST=postgres
       - DB_DATABASE=suitrent
-      - GROQ_API_KEY=${GROQ_API_KEY}
-      - OPENAI_API_KEY=${OPENAI_API_KEY}
+      - DB_USERNAME=suitrent
+      - DB_PASSWORD=${DB_PASSWORD}
     depends_on: [postgres]
     
   n8n:
@@ -606,6 +612,9 @@ services:
     ports: ["5678:5678"]
     environment:
       - WEBHOOK_URL=https://your-domain.com/
+      - GROQ_API_KEY=${GROQ_API_KEY}
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+      - TELEGRAM_BOT_TOKEN=${TELEGRAM_BOT_TOKEN}
     depends_on: [laravel]
     
   postgres:
@@ -656,6 +665,7 @@ volumes:
 - [ ] Multi-language support (English)
 - [ ] Subscription billing integration
 - [ ] Data export (CSV/Excel)
+- [ ] Two-factor authentication (2FA / TOTP)
 
 ### Phase 3 (Future) — Scale
 - [ ] Mobile app (Flutter/React Native)

@@ -14,18 +14,18 @@
 
 ## الأسبوع 1: الأساسيات (Foundation)
 
-### إعداد المشروع
-- [ ] تثبيت Laravel + Filament + Fortify + stancl/tenancy + spatie/laravel-activitylog
+- [ ] تثبيت Laravel + Filament + stancl/tenancy
 - [ ] إعداد PostgreSQL بدلاً من SQLite
 - [ ] إعداد Docker Compose (Nginx + Laravel + n8n + PostgreSQL)
-- [ ] إعداد المتغيرات البيئية (.env): GROQ_API_KEY, OPENAI_API_KEY, TELEGRAM_BOT_TOKEN
+- [ ] إعداد المتغيرات البيئية لـ Laravel (.env) ولـ n8n على الـ VPS (GROQ_API_KEY, OPENAI_API_KEY, TELEGRAM_BOT_TOKEN)
 
 ### قاعدة البيانات
 - [ ] إنشاء migration لجدول `tenants`
-- [ ] إنشاء migration لجدول `users` (مع tenant_id, role, telegram_user_id, 2FA)
+- [ ] إنشاء migration لجدول `users` (مع tenant_id, role, telegram_user_id)
 - [ ] إنشاء migration لجدول `items` (مع JSONB custom_fields)
 - [ ] إنشاء migration لجدول `bookings` (مع كل الحقول المالية)
 - [ ] إنشاء migration لجدول `booking_items`
+- [ ] إنشاء migration لجدول `booking_payments` (سجل حركات الدفع والغرامات)
 - [ ] إنشاء migration لجدول `collateral_records`
 - [ ] إنشاء migration لجدول `item_maintenance`
 - [ ] إنشاء migration لجدول `audit_logs`
@@ -33,7 +33,6 @@
 
 ### المصادقة والصلاحيات
 - [ ] تسجيل دخول لوحة التحكم (email/password)
-- [ ] دعم 2FA (TOTP) عبر Fortify
 - [ ] نظام أدوار للمحل: owner / staff، مع دور منفصل لمسؤول النظام (System Admin)
 - [ ] حماية كل الصفحات حسب الدور
 - [ ] قائمة بيضاء لتيليجرام (جدول + CRUD في لوحة التحكم)
@@ -151,7 +150,7 @@
 - [ ] بنية multi-tenancy كاملة
 - [ ] لوحة مسؤول النظام لإدارة المحلات والاشتراكات مركزياً
 - [ ] ربط tenant بمستخدم الويب الموثّق وبمستخدم تيليجرام المصرح له
-- [ ] تسجيل دخول + 2FA + أدوار
+- [ ] تسجيل دخول (بريد وكلمة مرور) + أدوار
 - [ ] إدارة المخزون (CRUD)
 - [ ] حجز يدوي (لوحة التحكم)
 - [ ] حجز صوتي (تيليجرام)
@@ -169,6 +168,7 @@
 - [ ] إدارة المستخدمين المتقدمة
 
 ### P2 (بعد الـ MVP)
+- [ ] دعم التحقق بخطوتين (2FA / TOTP)
 - [ ] تطبيق جوال
 - [ ] إشعارات للعملاء
 - [ ] تكامل بوابات الدفع
@@ -181,7 +181,6 @@
 
 | Method | Endpoint | الوصف |
 |---|---|---|
-| POST | `/api/v1/telegram/webhook` | استقبال بيانات الحجز من n8n |
 | POST | `/api/v1/availability/check` | فحص توفر العناصر |
 | POST | `/api/v1/bookings` | إنشاء حجز |
 | GET | `/api/v1/bookings` | قائمة الحجوزات |

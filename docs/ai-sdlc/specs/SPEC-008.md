@@ -6,7 +6,7 @@
 - **Source Intent:** [intent/audit-logging.md](file:///d:/mind-ai/occasion-suit-bookings/intent/audit-logging.md)
 - **Status:** Draft / Specification
 - **Target Version:** MVP v1.0
-- **Architectural Scope:** `spatie/laravel-activitylog`, Immutable Database Schema, Actor Attribution, Owner Audit Viewer
+- **Architectural Scope:** Native AuditService, Custom Immutable audit_logs Schema, Actor Attribution, Owner Audit Viewer
 
 ---
 

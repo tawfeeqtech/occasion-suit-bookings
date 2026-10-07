@@ -47,8 +47,8 @@ CREATE TABLE items (
 - Panel ID: `admin`
 - Locale: `ar`
 - Direction: `rtl`
-- Fonts: Cairo or Tajawal (Google Fonts)
-- Theme: Rich dark/light mode with customized primary colors.
+- Fonts: IBM Plex Sans Arabic, Cairo, or Tajawal
+- Theme: Rich dark/light mode following design.md luxury tokens.
 
 ---
 

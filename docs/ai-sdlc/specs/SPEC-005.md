@@ -6,7 +6,7 @@
 - **Source Intent:** [intent/cleaning-buffer-management.md](file:///d:/mind-ai/occasion-suit-bookings/intent/cleaning-buffer-management.md)
 - **Status:** Draft / Specification
 - **Target Version:** MVP v1.0
-- **Architectural Scope:** `item_maintenance` Table, Availability Engine Buffer Calculations, Scheduled Console Command (`app:release-cleaning-buffers`)
+- **Architectural Scope:** `item_maintenance` Table, Availability Engine Buffer Calculations, Scheduled Console Command (`buffer:release-clean-items`)
 
 ---
 
@@ -48,7 +48,7 @@ CREATE INDEX idx_item_maintenance_ready ON item_maintenance(tenant_id, status, e
 ```
 
 ### 3.2 Scheduled Worker Contract
-- **Command:** `php artisan app:release-cleaning-buffers`
+- **Command:** `php artisan buffer:release-clean-items`
 - **Schedule:** Runs every 15 minutes (`schedule->command(...)->everyFifteenMinutes()`).
 - **Operation:**
   1. Queries all `item_maintenance` records where `status = 'cleaning'` and `expected_ready_at <= NOW()`.
@@ -74,7 +74,7 @@ CREATE INDEX idx_item_maintenance_ready ON item_maintenance(tenant_id, status, e
 
 ### AC-005.3: Automated Buffer Expiry Execution
 - **Given:** 3 items with `status = 'cleaning'` where `expected_ready_at` is 1 hour in the past.
-- **When:** `ReleaseCleaningBuffersCommand` is executed via Artisan.
+- **When:** `ReleaseCleaningBuffersCommand` (`php artisan buffer:release-clean-items`) is executed via Artisan.
 - **Then:** All 3 items are updated to `status = 'available'` and their maintenance records marked `completed`.
 - **Verification Test:** `ReleaseCleaningBuffersCommandTest::test_artisan_command_releases_due_items`
 

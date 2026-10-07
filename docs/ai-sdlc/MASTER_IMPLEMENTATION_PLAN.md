@@ -17,7 +17,8 @@
    - ❌ لا توجد أي مناداة لنماذج الذكاء الاصطناعي (OpenAI GPT / Claude) داخل لارافيل.
    - ⚡ سيناريو n8n الخارجي هو الذي يستقبل صوت/نص تيليجرام، ويستدعي الذكاء الاصطناعي، ثم يرسل استدعاءات مهيكلة بصيغة JSON لـ API لارافيل.
 3. **المصادقة والأدوار:**
-   - دخول لوحة التحكم لمالك المتجر بالبريد الإلكتروني وكلمة المرور فقط (**تم إلغاء شرط 2FA TOTP لتسهيل الاستخدام**).
+   - ثلاثة أدوار معتمدة: **مسؤول النظام (System Admin)** على مستوى المنصة لإدارة المحلات والاشتراكات، و **مالك المتجر (Shop Owner)** لإدارة متجره، و **الموظف (Staff)** للعمليات اليومية.
+   - دخول لوحة التحكم لمالك المتجر ومسؤول النظام بالبريد الإلكتروني وكلمة المرور فقط (**تم إلغاء شرط 2FA TOTP لتسهيل الاستخدام**).
    - التحقق من موظفي تيليجرام عبر n8n يتم بمجرد **مطابقة `telegram_user_id`** الممرر مع المعرفات المسجلة مسبقاً لموظفي المتجر (`tenant_id`).
 4. **التسعير والغرامات اليدوية:**
    - تسعير الحجز (إجمالي الإيجار، الدفعة المقدمة، المتبقي) يُحدد **يدوياً** من المالك/الموظف.
@@ -35,8 +36,8 @@
 | رقم المواصفة | العنوان | النطاق في لارافيل | حالة المواصفة |
 |---|---|---|---|
 | **SPEC-001** | Multi-Tenant Architecture & Data Isolation | هيكلة الجداول مع `tenant_id` و Global Scope وعزل المتاجر | مخصصة ومطابقة |
-| **SPEC-002** | Authentication, RBAC & Telegram Whitelist | مصادقة البريد/كلمة المرور للمالك + مطابقة `telegram_user_id` لموظفي المتجر | مخصصة (إلغاء 2FA) |
-| **SPEC-003** | Web Admin Dashboard (Filament Arabic/RTL) | لوحة تحكم عصرية متجاوبة باللغة العربية لإدارة المخزون والحجوزات والموظفين | مخصصة ومطابقة |
+| **SPEC-002** | Authentication, RBAC & Telegram Whitelist | مصادقة البريد/كلمة المرور (System Admin / Owner) + مطابقة `telegram_user_id` لموظفي المتجر | مخصصة (إلغاء 2FA) |
+| **SPEC-003** | Web Admin Dashboard (Filament Arabic/RTL) | لوحة تحكم عصرية متجاوبة باللغة العربية لإدارة المخزون والموظفين، مع لوحة مركزية لمسؤول النظام للمتاجر والاشتراكات | مخصصة ومطابقة |
 | **SPEC-004** | Booking Backend & Availability API for n8n | نقاط API لفحص التوفر وإنشاء الحجز وقفل السجلات (التسعير اليدوي) | مخصصة (حذف STT/AI) |
 | **SPEC-005** | Automated Cleaning Buffer Management | حساب فترات التنظيف وجدول تحويل القطع إلى متاحة تلقائياً | مخصصة ومطابقة |
 | **SPEC-006** | Return & Inspection Workflow | قائمة فحص القطع، تقدير الغرامة يدوياً، وقفل فك حجز الهوية حتى التسوية | مخصصة ومطابقة |
@@ -59,10 +60,10 @@ graph TD
 ---
 
 ### المرحلة 1: البنية التحتية، الحزم، وقاعدة البيانات (SPEC-001 & SPEC-002)
-- [ ] تثبيت وتحديث حزم المشروع المطلوبة (`filament/filament`, `spatie/laravel-activitylog`, `stancl/tenancy`).
+- [ ] تثبيت وتحديث حزم المشروع المطلوبة (`filament/filament`, `stancl/tenancy`).
 - [ ] إعداد الاتصال بقاعدة بيانات PostgreSQL في ملف `.env`.
 - [ ] إنشاء Migration لجدول المستأجرين `tenants` (uuid, name, slug, settings jsonb, is_active).
-- [ ] إنشاء Migration لجدول المستخدمين `users` (uuid, tenant_id, name, email, password, role: owner/staff, telegram_user_id: bigint nullable, is_active).
+- [ ] إنشاء Migration لجدول المستخدمين `users` (uuid, tenant_id nullable for system_admin, name, email, password, role: system_admin/owner/staff, telegram_user_id: bigint nullable, is_active).
 - [ ] تطبيق `TenantScope` و `BelongsToTenant` Trait لضمان الفلترة التلقائية لكافة الاستعلامات.
 - [ ] إعداد المصادقة الأساسية (Session-based Auth بالبريد وكلمة المرور).
 - [ ] كتابة اختبارات عزل المتاجر وصحة الفلترة التلقائية.
@@ -73,6 +74,7 @@ graph TD
 - [ ] إنشاء Migration ونموذج `Item` (uuid, tenant_id, name, category, size, color, status, custom_fields jsonb).
 - [ ] إنشاء Migration ونموذج `Booking` (uuid, tenant_id, customer_name, customer_phone, pickup_date, return_date, status, total_fee, advance_paid, remaining_balance, payment_method, alterations_notes, created_by).
 - [ ] إنشاء Migration ونموذج `BookingItem` (uuid, tenant_id, booking_id, item_id, rental_price, inspection_status).
+- [ ] إنشاء Migration ونموذج `BookingPayment` (uuid, tenant_id, booking_id, amount, type: advance/final_payment/penalty, method: cash/palpay/jawwal_pay/bank_transfer, reference_number, recorded_by, created_at).
 - [ ] إنشاء Migration ونموذج `CollateralRecord` (uuid, tenant_id, booking_id, status: held/released, notes, held_at, released_at).
 - [ ] تطوير `AvailabilityService`:
   - فحص توفر القطع في النطاق الزمني المطلوب.
@@ -133,6 +135,9 @@ graph TD
   - إضافة وتعديل بيانات الموظفين وتعيين `telegram_user_id` لكل موظف.
 - [ ] إعدادات المتجر (`TenantSettings`):
   - تحديد مدة التنظيف الافتراضية بالساعات والعملة الرسمية.
+- [ ] لوحة مسؤول النظام المركزية (`PlatformAdmin` / `TenantResource`):
+  - إدارة سجلات المتاجر وحالاتها (تفعيل/تعطيل).
+  - إدارة سجلات الاشتراكات الشهرية الثابتة لكل متجر.
 
 ---
 
@@ -141,7 +146,7 @@ graph TD
   - تقرير يومي / أسبوعي / شهري يوضح الإيرادات، المبالغ المتبقية، والغرامات المحصلة.
   - تصنيف المبالغ حسب طريقة الدفع (كاش، Jawwal Pay، PalPay، تحويل بنكي).
 - [ ] سجل التدقيق (`AuditLogResource`):
-  - ربط مكتبة Spatie Activitylog لتسجيل كافة عمليات الحجز، الإرجاع، الغرامات، وفك بطاقات الهوية تلقائياً مع معرّف الفاعل والوقت.
+  - تطوير خدمة `AuditService` لتسجيل كافة عمليات الحجز، الإرجاع، الغرامات، وفك بطاقات الهوية تلقائياً في جدول `audit_logs` المخصص غير القابل للتعديل أو الحذف مع معرّف الفاعل والوقت.
   - صفحة عرض محمية للمالك فقط للقراءة وغير قابلة للتعديل أو الحذف.
 - [ ] تنفيذ اختبارات الوحدة واختبارات التكامل الشاملة (`php artisan test`).
 - [ ] تنسيق وضبط الكود باستخدام Laravel Pint (`vendor/bin/pint --format agent`).

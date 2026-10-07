@@ -18,7 +18,7 @@ Build the Laravel Filament admin panel in Arabic/RTL with tenant-scoped inventor
 - Staff accounts include a `telegram_user_id` field to support the n8n whitelist match.
 
 ## Implementation Steps
-1. Install and configure Filament panel (`admin`) with Arabic locale, RTL direction, and elegant typography (Cairo/Tajawal).
+1. Install and configure Filament panel (`admin`) with Arabic locale, RTL direction, and typography (IBM Plex Sans Arabic / Cairo / Tajawal).
 2. Configure tenant-aware panel navigation and role policies (`owner` vs `staff`).
 3. Create `ItemResource` for inventory management (suits, shirts, shoes, accessories) with JSONB dynamic attributes.
 4. Create `UserResource` for staff management: add/edit staff, activate/deactivate, and assign `telegram_user_id`.

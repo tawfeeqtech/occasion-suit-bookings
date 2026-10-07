@@ -12,8 +12,8 @@ Implement Laravel-side booking balances, manual payment recording, tenant curren
 - Payment gateways, payment APIs, online checkout, and Telegram/n8n collection workflows. Payments are manually recorded by authorized staff/owners inside the Laravel application.
 
 ## Open Questions and Constraints
-- **Blocking accounting-source decision:** `booking_payments` is described as optional, but accurate daily revenue by payment method and settled penalties require dated payment events. Decide whether every advance, balance, and penalty collection must be a ledger entry or whether `bookings` remains the source of truth before implementing reports.
-- **Balance representation:** The SPEC suggests a PostgreSQL generated `remaining_balance` column while the main contract also describes it as computed. Confirm whether to persist a generated column or derive it in the model/query; do not duplicate mutable values.
+- **Resolved accounting-source decision:** Approved `booking_payments` as the canonical payment ledger for all dated transaction events (advance, final payment, penalties) to ensure accurate daily reports by payment method.
+- **Balance representation:** `bookings.remaining_balance` is stored as a PostgreSQL generated column `GENERATED ALWAYS AS (total_fee - advance_paid) STORED`.
 - Enforce non-negative amounts and `advance_paid <= total_fee`; use exact decimal arithmetic, not floating point.
 - Keep one configured currency per tenant (default ILS), with no conversion or mixed currency.
 

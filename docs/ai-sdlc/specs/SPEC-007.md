@@ -37,7 +37,7 @@ ALTER TABLE bookings
     GENERATED ALWAYS AS (total_fee - advance_paid) STORED;
 ```
 
-### 3.2 Payment Log Table (Optional MVP / Structured Payments)
+### 3.2 Payments Ledger Table (Normative Contract)
 ```sql
 CREATE TABLE booking_payments (
     id UUID PRIMARY KEY,

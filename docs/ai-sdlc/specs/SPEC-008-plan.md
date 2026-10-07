@@ -12,7 +12,7 @@ Implement Laravel-domain audit capture with actor and tenant attribution, append
 - Telegram-specific audit transport or event delivery. Laravel domain events such as a booking being created are audited here regardless of whether a future caller is web or Telegram; the integration itself is excluded.
 
 ## Open Questions and Constraints
-- **Blocking persistence conflict:** `AGENTS.md` requires `spatie/laravel-activitylog`, while SPEC-008 specifies a custom `audit_logs` table. Decide whether to adapt the package's storage contract, use a custom activity model/table, or formally revise one contract before migrations.
+- **Resolved persistence decision:** Approved using custom `audit_logs` table and native `AuditService` with model-level and database-level immutability guards, avoiding third-party package conflicts.
 - The SPEC's proposed Eloquent `update()`/`delete()` overrides do not stop mass query-builder changes, raw SQL, or database administration. The immutability guarantee needs a database-enforced strategy and defined privileged maintenance exception.
 - Audit retention is indefinite for MVP; audit writes for sensitive mutations must share the parent transaction and fail the parent mutation if the audit insert fails.
 - Audit viewer authorization depends on the final role/tenant model in SPEC-001/002.

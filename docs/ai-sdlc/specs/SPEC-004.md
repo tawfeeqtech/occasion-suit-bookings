@@ -53,7 +53,7 @@ CREATE TABLE bookings (
     status VARCHAR(50) NOT NULL DEFAULT 'active', -- 'active' | 'completed' | 'overdue' | 'damage_pending' | 'cancelled'
     total_fee DECIMAL(10,2) NOT NULL,
     advance_paid DECIMAL(10,2) NOT NULL DEFAULT 0.00,
-    remaining_balance DECIMAL(10,2) NOT NULL DEFAULT 0.00,
+    remaining_balance DECIMAL(10,2) GENERATED ALWAYS AS (total_fee - advance_paid) STORED,
     payment_method VARCHAR(100) NOT NULL, -- 'cash' | 'palpay' | 'jawwal_pay' | 'bank_transfer'
     alterations_notes TEXT,
     created_by UUID REFERENCES users(id),
@@ -72,7 +72,9 @@ CREATE TABLE booking_items (
     item_id UUID NOT NULL REFERENCES items(id) ON DELETE RESTRICT,
     rental_price DECIMAL(10,2) DEFAULT 0.00,
     inspection_status VARCHAR(50) NOT NULL DEFAULT 'clean_pass', -- 'clean_pass' | 'damaged' | 'missing'
-    penalty_amount DECIMAL(10,2) DEFAULT 0.00,
+    penalty_fee DECIMAL(10,2) DEFAULT 0.00,
+    penalty_reason TEXT,
+    is_waived BOOLEAN DEFAULT FALSE,
     damage_notes TEXT,
     created_at TIMESTAMPTZ DEFAULT NOW(),
     updated_at TIMESTAMPTZ DEFAULT NOW()

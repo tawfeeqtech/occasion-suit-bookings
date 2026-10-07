@@ -19,9 +19,7 @@ Multi-tenant SaaS for wedding suit rental shops. Internal-only (no customer-faci
 
 ```bash
 composer require filament/filament
-composer require laravel/fortify          # Auth + 2FA
 composer require stancl/tenancy          # Multi-tenancy
-composer require spatie/laravel-activitylog  # Audit trail
 ```
 
 ## Key Commands
@@ -87,19 +85,19 @@ The project uses exactly three role categories, each with a distinct scope:
 - Tenant data isolation at the database level (not just UI)
 - All UI text in Arabic with RTL layout (Filament supports this natively)
 
-## Environment Variables to Add
+## Environment Variables (VPS / n8n & Laravel)
 
 ```env
-# AI APIs
+# VPS / n8n Environment (AI & Telegram Orchestration)
 GROQ_API_KEY=
 OPENAI_API_KEY=
 ANTHROPIC_API_KEY=
-
-# Telegram
 TELEGRAM_BOT_TOKEN=
-
-# n8n
 N8N_WEBHOOK_URL=
+
+# Laravel Environment
+APP_ENV=production
+DB_CONNECTION=pgsql
 ```
 
 ## Directory Structure (Planned)
