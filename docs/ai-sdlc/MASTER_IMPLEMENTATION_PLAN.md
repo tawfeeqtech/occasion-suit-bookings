@@ -60,13 +60,13 @@ graph TD
 ---
 
 ### المرحلة 1: البنية التحتية، الحزم، وقاعدة البيانات (SPEC-001 & SPEC-002)
-- [ ] تثبيت وتحديث حزم المشروع المطلوبة (`filament/filament`, `stancl/tenancy`).
-- [ ] إعداد الاتصال بقاعدة بيانات PostgreSQL في ملف `.env`.
-- [ ] إنشاء Migration لجدول المستأجرين `tenants` (uuid, name, slug, settings jsonb, is_active).
-- [ ] إنشاء Migration لجدول المستخدمين `users` (uuid, tenant_id nullable for system_admin, name, email, password, role: system_admin/owner/staff, telegram_user_id: bigint nullable, is_active).
-- [ ] تطبيق `TenantScope` و `BelongsToTenant` Trait لضمان الفلترة التلقائية لكافة الاستعلامات.
-- [ ] إعداد المصادقة الأساسية (Session-based Auth بالبريد وكلمة المرور).
-- [ ] كتابة اختبارات عزل المتاجر وصحة الفلترة التلقائية.
+- [x] تثبيت وتحديث حزم المشروع المطلوبة (`filament/filament`, `stancl/tenancy`).
+- [x] إعداد الاتصال بقاعدة بيانات PostgreSQL في ملف `.env`.
+- [x] إنشاء Migration لجدول المستأجرين `tenants` (uuid, name, slug, settings jsonb, is_active).
+- [x] إنشاء Migration لجدول المستخدمين `users` (uuid, tenant_id nullable for system_admin, name, email, password, role: system_admin/owner/staff, telegram_user_id: bigint nullable, is_active).
+- [x] تطبيق `TenantScope` و `BelongsToTenant` Trait لضمان الفلترة التلقائية لكافة الاستعلامات.
+- [x] إعداد المصادقة الأساسية (Session-based Auth بالبريد وكلمة المرور).
+- [x] كتابة اختبارات عزل المتاجر وصحة الفلترة التلقائية.
 
 ---
 
