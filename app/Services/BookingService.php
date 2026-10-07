@@ -16,7 +16,8 @@ use Illuminate\Support\Facades\DB;
 class BookingService
 {
     public function __construct(
-        protected AvailabilityService $availabilityService
+        protected AvailabilityService $availabilityService,
+        protected AuditService $auditService
     ) {}
 
     /**
@@ -157,6 +158,23 @@ class BookingService
                 'notes' => 'Collateral held at booking confirmation',
                 'held_at' => now(),
             ]);
+
+            // 9. Record immutable audit log
+            $this->auditService->log(
+                action: 'booking.created',
+                entityType: 'Booking',
+                entityId: $booking->id,
+                metadata: [
+                    'booking_number' => $bookingNumber,
+                    'customer_name' => $data['customer_name'],
+                    'customer_phone' => $data['customer_phone'],
+                    'items_count' => count($itemIds),
+                    'total_fee' => $totalFee,
+                    'advance_paid' => $advancePaid,
+                ],
+                actor: $creator,
+                tenantId: $tenantId
+            );
 
             return $booking->fresh(['bookingItems.item', 'payments', 'collateralRecord']);
         });

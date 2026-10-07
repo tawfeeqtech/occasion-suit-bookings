@@ -4,6 +4,7 @@ namespace App\Console\Commands;
 
 use App\Models\Item;
 use App\Models\ItemMaintenance;
+use App\Services\AuditService;
 use Carbon\Carbon;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
@@ -43,7 +44,9 @@ class ReleaseCleaningBuffersCommand extends Command
         }
 
         $count = 0;
-        DB::transaction(function () use ($records, $now, &$count) {
+        $auditService = app(AuditService::class);
+
+        DB::transaction(function () use ($records, $now, &$count, $auditService) {
             foreach ($records as $record) {
                 $record->update([
                     'status' => 'completed',
@@ -55,6 +58,18 @@ class ReleaseCleaningBuffersCommand extends Command
                     ->update(['status' => 'available']);
 
                 $count++;
+
+                $auditService->log(
+                    action: 'buffer.released',
+                    entityType: 'ItemMaintenance',
+                    entityId: $record->id,
+                    metadata: [
+                        'item_id' => $record->item_id,
+                        'completed_at' => $now->toIso8601String(),
+                    ],
+                    actor: null,
+                    tenantId: $record->tenant_id
+                );
             }
         });
 

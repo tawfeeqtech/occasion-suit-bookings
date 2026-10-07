@@ -17,6 +17,10 @@ use Illuminate\Validation\ValidationException;
 
 class ReturnService
 {
+    public function __construct(
+        protected AuditService $auditService
+    ) {}
+
     /**
      * Process return of booking items, inspecting all bundle items and managing cleaning/damage.
      *
@@ -170,6 +174,21 @@ class ReturnService
                 $this->releaseCollateral($booking, $actor);
             }
 
+            // 8. Record audit log
+            $this->auditService->log(
+                action: 'return.processed',
+                entityType: 'Booking',
+                entityId: $booking->id,
+                metadata: [
+                    'booking_number' => $booking->booking_number,
+                    'status' => $booking->status,
+                    'items_count' => $submittedItems->count(),
+                    'remaining_balance' => (float) $booking->remaining_balance,
+                ],
+                actor: $actor,
+                tenantId: $tenantId
+            );
+
             return $booking->fresh(['bookingItems.item', 'payments', 'collateralRecord']);
         });
     }
@@ -241,6 +260,19 @@ class ReturnService
                 $booking->update(['status' => 'completed']);
             }
 
+            $this->auditService->log(
+                action: 'collateral.released',
+                entityType: 'CollateralRecord',
+                entityId: $collateral->id,
+                metadata: [
+                    'booking_id' => $booking->id,
+                    'booking_number' => $booking->booking_number,
+                    'notes' => $notes,
+                ],
+                actor: $actor,
+                tenantId: $booking->tenant_id
+            );
+
             return $collateral->fresh();
         });
     }
@@ -268,6 +300,20 @@ class ReturnService
                     $booking->update(['status' => 'completed']);
                 }
             }
+
+            $this->auditService->log(
+                action: 'penalty.waived',
+                entityType: 'BookingItem',
+                entityId: $bookingItem->id,
+                metadata: [
+                    'booking_id' => $bookingItem->booking_id,
+                    'item_id' => $bookingItem->item_id,
+                    'penalty_fee' => (float) $bookingItem->penalty_fee,
+                    'reason' => $reason,
+                ],
+                actor: $actor,
+                tenantId: $bookingItem->tenant_id
+            );
         });
     }
 
@@ -292,6 +338,19 @@ class ReturnService
                     $booking->update(['status' => 'completed']);
                 }
             }
+
+            $this->auditService->log(
+                action: 'penalty.paid',
+                entityType: 'BookingPayment',
+                entityId: $payment->id,
+                metadata: [
+                    'booking_id' => $booking->id,
+                    'amount' => $amount,
+                    'method' => $paymentMethod,
+                ],
+                actor: $actor,
+                tenantId: $booking->tenant_id
+            );
 
             return $payment;
         });
