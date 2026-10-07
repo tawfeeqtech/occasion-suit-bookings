@@ -71,19 +71,19 @@ graph TD
 ---
 
 ### المرحلة 2: إدارة المخزون، التوفر، والحجز المقفل (SPEC-001, SPEC-004, SPEC-005)
-- [ ] إنشاء Migration ونموذج `Item` (uuid, tenant_id, name, category, size, color, status, custom_fields jsonb).
-- [ ] إنشاء Migration ونموذج `Booking` (uuid, tenant_id, customer_name, customer_phone, pickup_date, return_date, status, total_fee, advance_paid, remaining_balance, payment_method, alterations_notes, created_by).
-- [ ] إنشاء Migration ونموذج `BookingItem` (uuid, tenant_id, booking_id, item_id, rental_price, inspection_status).
-- [ ] إنشاء Migration ونموذج `BookingPayment` (uuid, tenant_id, booking_id, amount, type: advance/final_payment/penalty, method: cash/palpay/jawwal_pay/bank_transfer, reference_number, recorded_by, created_at).
-- [ ] إنشاء Migration ونموذج `CollateralRecord` (uuid, tenant_id, booking_id, status: held/released, notes, held_at, released_at).
-- [ ] تطوير `AvailabilityService`:
+- [x] إنشاء Migration ونموذج `Item` (uuid, tenant_id, name, category, size, color, status, custom_fields jsonb).
+- [x] إنشاء Migration ونموذج `Booking` (uuid, tenant_id, customer_name, customer_phone, pickup_date, return_date, status, total_fee, advance_paid, remaining_balance, payment_method, alterations_notes, created_by).
+- [x] إنشاء Migration ونموذج `BookingItem` (uuid, tenant_id, booking_id, item_id, rental_price, inspection_status).
+- [x] إنشاء Migration ونموذج `BookingPayment` (uuid, tenant_id, booking_id, amount, type: advance/final_payment/penalty, method: cash/palpay/jawwal_pay/bank_transfer, reference_number, recorded_by, created_at).
+- [x] إنشاء Migration ونموذج `CollateralRecord` (uuid, tenant_id, booking_id, status: held/released, notes, held_at, released_at).
+- [x] تطوير `AvailabilityService`:
   - فحص توفر القطع في النطاق الزمني المطلوب.
   - حساب فترة التنظيف `buffer_hours` (الافتراضي 48 ساعة من إعدادات المتجر).
-- [ ] تطوير `BookingService`:
+- [x] تطوير `BookingService`:
   - قفل عناصر المخزون المطلوبة ترتيباً تصاعدياً باستخدام `SELECT ... FOR UPDATE`.
   - إعادة التحقق من التوفر داخل الـ Transaction لمنع التضارب الزمني.
   - حفظ الحجز ومفرداته وإنشاء سجل الضمان `held`.
-- [ ] كتابة اختبارات منع الحجز المزدوج التزامني `test_simultaneous_booking_requests_prevent_double_booking`.
+- [x] كتابة اختبارات منع الحجز المزدوج التزامني `test_simultaneous_booking_requests_prevent_double_booking`.
 
 ---
 
