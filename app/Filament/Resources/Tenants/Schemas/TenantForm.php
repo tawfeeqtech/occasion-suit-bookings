@@ -33,6 +33,30 @@ class TenantForm
                             ->visible(fn (): bool => (bool) auth()->user()?->isSystemAdmin()),
                     ]),
 
+                Section::make('حساب مالك المتجر')
+                    ->schema([
+                        TextInput::make('owner.name')
+                            ->label('اسم المالك')
+                            ->required()
+                            ->maxLength(255),
+
+                        TextInput::make('owner.email')
+                            ->label('البريد الإلكتروني للمالك')
+                            ->email()
+                            ->required()
+                            ->unique(table: 'users', column: 'email')
+                            ->maxLength(255),
+
+                        TextInput::make('owner.password')
+                            ->label('كلمة المرور الأولية للمالك')
+                            ->password()
+                            ->required()
+                            ->minLength(8)
+                            ->maxLength(255)
+                            ->dehydrated(),
+                    ])
+                    ->visible(fn (string $operation): bool => $operation === 'create'),
+
                 Section::make('إعدادات التشغيل والسياسات')
                     ->schema([
                         TextInput::make('settings.buffer_hours')

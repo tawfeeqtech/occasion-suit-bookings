@@ -6,7 +6,9 @@ use App\Models\Item;
 use App\Models\Tenant;
 use App\Models\User;
 use App\Tenancy\TenantContext;
+use Illuminate\Database\QueryException;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\DB;
 use Tests\TestCase;
 
 class TelegramWhitelistAuthTest extends TestCase
@@ -62,7 +64,7 @@ class TelegramWhitelistAuthTest extends TestCase
     /**
      * AC-002.3: Whitelisted Telegram staff is authenticated and scoped to tenant.
      */
-    public function test_whitelisted_telegram_user_is_authenticated(): void
+    public function test_telegram_staff_request_uses_assigned_tenant(): void
     {
         $tenantA = Tenant::factory()->create();
         $staffA = User::factory()->staff($tenantA->id)->create([
@@ -87,5 +89,27 @@ class TelegramWhitelistAuthTest extends TestCase
         $response->assertStatus(200);
         $response->assertJsonFragment(['name' => 'Tenant A Suit']);
         $response->assertJsonMissing(['name' => 'Tenant B Suit']);
+    }
+
+    public function test_telegram_id_cannot_be_reused_across_shops(): void
+    {
+        $tenantA = Tenant::factory()->create();
+        $tenantB = Tenant::factory()->create();
+
+        User::factory()->staff($tenantA->id)->create([
+            'telegram_user_id' => 712345678,
+        ]);
+
+        try {
+            DB::transaction(fn () => User::factory()->staff($tenantB->id)->create([
+                'telegram_user_id' => 712345678,
+            ]));
+            $this->fail('A Telegram user ID must not be assignable to a second shop.');
+        } catch (QueryException) {
+            $this->assertSame(
+                1,
+                User::withoutGlobalScopes()->where('telegram_user_id', 712345678)->count()
+            );
+        }
     }
 }

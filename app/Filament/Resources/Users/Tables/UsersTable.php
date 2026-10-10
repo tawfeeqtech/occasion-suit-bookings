@@ -2,8 +2,7 @@
 
 namespace App\Filament\Resources\Users\Tables;
 
-use Filament\Actions\BulkActionGroup;
-use Filament\Actions\DeleteBulkAction;
+use App\Models\User;
 use Filament\Actions\EditAction;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
@@ -66,12 +65,9 @@ class UsersTable
                 //
             ])
             ->recordActions([
-                EditAction::make()->label('تعديل'),
-            ])
-            ->toolbarActions([
-                BulkActionGroup::make([
-                    DeleteBulkAction::make()->label('حذف المحدد'),
-                ]),
+                EditAction::make()
+                    ->label('تعديل')
+                    ->visible(fn (User $record): bool => $record->role !== 'owner' || auth()->user()?->isSystemAdmin()),
             ]);
     }
 }

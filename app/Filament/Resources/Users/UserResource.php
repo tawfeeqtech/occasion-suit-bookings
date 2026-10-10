@@ -13,6 +13,7 @@ use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
+use Illuminate\Validation\ValidationException;
 
 class UserResource extends Resource
 {
@@ -45,12 +46,44 @@ class UserResource extends Resource
 
     public static function canEdit($record): bool
     {
-        return static::canViewAny();
+        $user = auth()->user();
+
+        if ($user === null || $record->role === 'system_admin') {
+            return false;
+        }
+
+        return $user->isSystemAdmin()
+            || ($user->isOwner() && $record->role === 'staff' && $record->tenant_id === $user->tenant_id);
     }
 
     public static function canDelete($record): bool
     {
-        return static::canViewAny();
+        $user = auth()->user();
+
+        if ($user === null || $record->role === 'owner' || $record->role === 'system_admin') {
+            return false;
+        }
+
+        return $user->isSystemAdmin()
+            || ($user->isOwner() && $record->tenant_id === $user->tenant_id);
+    }
+
+    public static function ensureNoActiveOwner(string $tenantId, ?string $exceptUserId = null): void
+    {
+        $query = User::withoutGlobalScopes()
+            ->where('tenant_id', $tenantId)
+            ->where('role', 'owner')
+            ->where('is_active', true);
+
+        if ($exceptUserId !== null) {
+            $query->whereKeyNot($exceptUserId);
+        }
+
+        if ($query->exists()) {
+            throw ValidationException::withMessages([
+                'data.tenant_id' => 'يوجد مالك نشط لهذا المتجر. عطّل الحساب الحالي قبل إنشاء مالك بديل.',
+            ]);
+        }
     }
 
     public static function form(Schema $schema): Schema
