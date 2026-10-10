@@ -14,6 +14,7 @@ This directory contains the testable engineering specifications produced by the 
 | [SPEC-006](file:///d:/mind-ai/occasion-suit-bookings/docs/ai-sdlc/specs/SPEC-006.md) | Return & Inspection Workflow | [intent/return-inspection-workflow.md](file:///d:/mind-ai/occasion-suit-bookings/intent/return-inspection-workflow.md) | Inspection Checklist & Collateral Guard Tests |
 | [SPEC-007](file:///d:/mind-ai/occasion-suit-bookings/docs/ai-sdlc/specs/SPEC-007.md) | Financial Tracking & Reporting | [intent/financial-tracking.md](file:///d:/mind-ai/occasion-suit-bookings/intent/financial-tracking.md) | Ledger Balance & Aggregation Accuracy Tests |
 | [SPEC-008](file:///d:/mind-ai/occasion-suit-bookings/docs/ai-sdlc/specs/SPEC-008.md) | Audit Logging & Traceability | [intent/audit-logging.md](file:///d:/mind-ai/occasion-suit-bookings/intent/audit-logging.md) | Append-Only Immutability & Event Trigger Tests |
+| [SPEC-009](file:///d:/mind-ai/occasion-suit-bookings/docs/ai-sdlc/specs/SPEC-009.md) | Shop and Owner Onboarding | [intent/shop-owner-onboarding.md](file:///d:/mind-ai/occasion-suit-bookings/intent/shop-owner-onboarding.md) | Atomic Tenant/Owner Creation & Tenant Assignment Tests |
 
 ---
 

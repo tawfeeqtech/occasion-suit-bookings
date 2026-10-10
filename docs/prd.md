@@ -25,7 +25,7 @@
 | ID | User Story | Priority |
 |---|---|---|
 | US-O-01 | As a shop owner, I want to log in to the web dashboard with email/password so that only authorized users access my shop's data | P0 |
-| US-O-02 | As a shop owner, I want to manage staff accounts and assign roles (staff vs. shop owner) so that I control who can perform which actions | P0 |
+| US-O-02 | As a shop owner, I want to manage staff accounts and their Telegram IDs so that I control who can operate in my shop | P0 |
 | US-O-03 | As a shop owner, I want to configure my shop's suit inventory with dynamic bundles (jacket, trousers, shirt, vest, shoes, belt, tie, lapel pin) and custom fields so that the system matches my shop's unique catalog | P0 |
 | US-O-04 | As a shop owner, I want to set configurable cleaning/buffer turnaround times per item so that suits cannot be rebooked before they are ready | P0 |
 | US-O-05 | As a shop owner, I want to view financial reports (revenue, outstanding balances, deposits collected) so that I can track business performance | P1 |
@@ -39,6 +39,11 @@
 |---|---|---|
 | US-PA-01 | As a System Admin, I want to manage shop records and their subscription records from a central platform dashboard so that I can administer tenants independently of shop-owner accounts | P0 |
 | US-PA-02 | As a System Admin, I want each shop's subscription to use a fixed monthly fee so that subscription pricing is consistent per shop; the fee amount remains to be determined | P0 |
+| US-PA-03 | As a System Admin, I want to create a shop and its owner account together so that the owner is tenant-scoped and can log in immediately | P0 |
+| US-PA-04 | As a System Admin, I want to select a shop when creating a staff account so that the staff member is explicitly assigned to the correct tenant | P0 |
+| US-PA-05 | As a System Admin, I want to deactivate a shop's current owner and create a replacement owner so that every shop has at most one active owner | P0 |
+
+**MVP boundary:** Each shop has at most one active owner account; only the System Admin can replace an owner after deactivating the current account. Each Shop Owner account and Telegram user ID is associated with one shop only. Supporting one owner across multiple shops and multiple branches per shop is out of scope for MVP and may be considered later.
 
 ### 2.3 Staff Member (Operator)
 
@@ -108,6 +113,32 @@ Feature: System Admin Platform Dashboard
     Then they can view and manage shop records and their subscription records
     And subscription pricing is recorded as a fixed monthly fee per shop
     And the Shop Owner cannot access other shops' records through this dashboard
+
+  Scenario: System Admin creates a shop with its owner
+    Given an authenticated System Admin
+    When they submit a new shop with a unique slug and the owner's name, email, and initial password
+    Then the shop and owner account are created in one database transaction
+    And the owner's tenant_id is set to the new shop's ID
+    And the owner can log in with the provided credentials and is scoped to that shop
+    And the initial password is stored only as a hash
+
+  Scenario: Shop owner creates staff for their shop
+    Given an authenticated Shop Owner associated with tenant "shop_a"
+    When they create a staff account
+    Then the staff account is assigned tenant_id "shop_a" automatically
+
+  Scenario: System Admin creates staff for a selected shop
+    Given an authenticated System Admin
+    When they create a staff account and select tenant "shop_a"
+    Then the staff account is assigned tenant_id "shop_a"
+    And the staff account cannot access another tenant's records
+
+  Scenario: System Admin replaces a shop owner
+    Given shop "shop_a" has an active owner
+    When the System Admin deactivates that owner and creates a replacement owner for "shop_a"
+    Then the former owner account remains stored and inactive
+    And exactly one active owner account is associated with "shop_a"
+    And a Shop Owner cannot create or promote another owner account
 ```
 
 ### 3.2 Voice-Driven Booking Flow
@@ -422,6 +453,7 @@ Feature: System Performance
 CREATE TABLE tenants (
     id UUID PRIMARY KEY,
     name VARCHAR(255) NOT NULL,
+    slug VARCHAR(255) UNIQUE NOT NULL,   -- readable identifier; user relationships use tenant_id
     settings JSONB DEFAULT '{}',        -- buffer hours, pricing rules, etc.
     created_at TIMESTAMPTZ DEFAULT NOW()
 );

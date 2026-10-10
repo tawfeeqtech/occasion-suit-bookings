@@ -33,6 +33,7 @@ Tenant (Shop)
 
 ### Create User
 - Required: `name`, `email`, `password`, `role`, `tenant_id`
+- Shop Owners may create/manage staff only; only the System Admin may create an owner account or replace a deactivated owner.
 - Optional: `telegram_user_id` (for bot access)
 - Email must be unique across all tenants
 
@@ -74,7 +75,8 @@ Tenant (Shop)
 
 - **Tenant isolation is non-negotiable.** Every query must include `WHERE tenant_id = current_tenant`.
 - **Email is globally unique.** Same email cannot be used across different tenants.
-- **Telegram user_id is per-tenant.** Same person can be whitelisted in multiple shops.
+- **MVP Telegram user_id assignment is one shop only.** The same Telegram ID cannot be associated with multiple shops in MVP. Multi-shop ownership and multiple branches per shop are deferred until after MVP.
+- **One active owner per shop in MVP.** Inactive owner accounts are retained; only the System Admin may create a replacement after deactivating the current owner. Shop Owners cannot create or promote another owner.
 - **Deactivating a user does not delete their audit logs.** Historical records are preserved.
 - **2FA is optional but recommended** for owner accounts.
 
