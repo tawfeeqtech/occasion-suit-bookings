@@ -40,13 +40,19 @@ class FinancialAndAuditAuthorizationTest extends TestCase
      */
     public function test_owner_can_access_financial_reports_and_audit_logs(): void
     {
-        $tenant = Tenant::factory()->create();
+        $tenant = Tenant::factory()->create([
+            'settings' => ['currency' => 'USD'],
+        ]);
         $owner = User::factory()->owner($tenant->id)->create();
 
         $this->actingAs($owner);
 
         $responseReports = $this->get('/admin/financial-reports');
         $responseReports->assertStatus(200);
+        $responseReports->assertSee('ملخص الأداء المالي');
+        $responseReports->assertSee('الإيرادات حسب طريقة الدفع');
+        $responseReports->assertSee('سجل الدفعات الأخيرة');
+        $responseReports->assertSee('USD');
 
         $responseAudit = $this->get('/admin/audit-logs');
         $responseAudit->assertStatus(200);
