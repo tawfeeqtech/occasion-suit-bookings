@@ -4,13 +4,21 @@ namespace Tests\Feature;
 
 use App\Models\Tenant;
 use App\Models\User;
+use App\Tenancy\TenantContext;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Tests\TestCase;
 
 class AuthenticationFeatureTest extends TestCase
 {
     use RefreshDatabase;
+
+    protected function tearDown(): void
+    {
+        TenantContext::clear();
+        parent::tearDown();
+    }
 
     /**
      * AC-002.1: Web Login & Session Creation
@@ -34,6 +42,25 @@ class AuthenticationFeatureTest extends TestCase
 
         $response->assertRedirect('/dashboard');
         $this->assertAuthenticatedAs($user);
+    }
+
+    public function test_authenticated_session_can_load_admin_dashboard_on_a_new_request(): void
+    {
+        $tenant = Tenant::factory()->create();
+        User::factory()->owner($tenant->id)->create([
+            'email' => 'owner@shop.com',
+            'password' => Hash::make('secret123'),
+            'is_active' => true,
+        ]);
+
+        $this->post('/login', [
+            'email' => 'owner@shop.com',
+            'password' => 'secret123',
+        ])->assertRedirect('/dashboard');
+
+        Auth::forgetGuards();
+
+        $this->get('/admin')->assertOk();
     }
 
     /**
