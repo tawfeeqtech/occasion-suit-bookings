@@ -2,3 +2,198 @@
 
 @source '../../../../app/Filament/**/*';
 @source '../../../../resources/views/filament/**/*';
+
+@layer components {
+    .fi-body {
+        @apply dark:bg-slate-950 dark:text-slate-100;
+    }
+
+    .fi-sidebar {
+        @apply dark:bg-slate-950;
+    }
+
+    .fi-topbar {
+        @apply dark:bg-slate-950 dark:ring-slate-800;
+    }
+
+    .fi-page-header-main-ctn > .fi-header {
+        @apply rounded-2xl border border-slate-800 bg-gradient-to-br from-slate-900 via-slate-900 to-slate-800 px-5 py-5 shadow-sm sm:px-7;
+    }
+
+    .fi-page-header-main-ctn > .fi-header .fi-header-heading {
+        @apply text-white;
+    }
+
+    .fi-page-header-main-ctn > .fi-header .fi-header-subheading {
+        @apply text-slate-300;
+    }
+
+    .fi-section:not(.fi-section-not-contained):not(.fi-aside) {
+        @apply dark:bg-slate-900 dark:ring-slate-800;
+    }
+
+    .fi-section:not(.fi-section-not-contained) > .fi-section-header {
+        @apply dark:border-slate-800;
+    }
+
+    .fi-ta-ctn {
+        @apply overflow-hidden rounded-xl border border-slate-800 bg-slate-900 shadow-sm dark:ring-slate-800;
+    }
+
+    .fi-ta-ctn .fi-ta-header,
+    .fi-ta-ctn .fi-ta-header-toolbar,
+    .fi-ta-ctn .fi-pagination {
+        @apply border-slate-800;
+    }
+
+    .fi-ta-ctn .fi-ta-header .fi-ta-header-heading {
+        @apply text-white;
+    }
+
+    .fi-ta-ctn .fi-ta-header .fi-ta-header-description {
+        @apply text-slate-400;
+    }
+
+    .fi-ta-ctn .fi-pagination .fi-pagination-overview {
+        @apply text-slate-300;
+    }
+
+    .fi-ta-ctn .fi-ta-table > thead > tr:not(.fi-ta-table-stacked-header-row) {
+        @apply bg-slate-800/70;
+    }
+
+    .fi-ta-ctn .fi-ta-table > thead > tr > .fi-ta-header-cell,
+    .fi-ta-ctn .fi-ta-table > thead > .fi-ta-table-head-groups-row > .fi-ta-header-group-cell {
+        @apply px-5 py-3.5 text-xs font-semibold text-slate-300;
+    }
+
+    .fi-ta-ctn .fi-ta-records > .fi-ta-row {
+        @apply border-b border-slate-800 bg-slate-900 text-slate-300 transition-colors duration-150;
+    }
+
+    .fi-ta-ctn .fi-ta-records > .fi-ta-row:hover {
+        @apply bg-slate-800/60;
+    }
+
+    .fi-ta-ctn .fi-ta-records > .fi-ta-row > .fi-ta-cell:not(.fi-ta-selection-cell):not(:has(.fi-ta-actions)) {
+        @apply px-4 py-4 text-sm text-slate-300 sm:px-5;
+    }
+
+    .fi-ta-ctn .fi-ta-records .fi-ta-text-item {
+        @apply text-slate-300;
+    }
+
+    .fi-ta-ctn .fi-ta-records .fi-ta-cell-booking-number .fi-ta-text-item {
+        @apply font-mono font-semibold text-amber-300;
+    }
+
+    .fi-ta-ctn .fi-ta-records .fi-ta-cell-name .fi-ta-text-item,
+    .fi-ta-ctn .fi-ta-records .fi-ta-cell-customer-name .fi-ta-text-item,
+    .fi-ta-ctn .fi-ta-records .fi-ta-cell-actor-user\.name .fi-ta-text-item {
+        @apply font-semibold text-white;
+    }
+
+    .fi-ta-ctn .fi-ta-records .fi-ta-cell-total-fee .fi-ta-text-item,
+    .fi-ta-ctn .fi-ta-records .fi-ta-cell-remaining-balance .fi-ta-text-item,
+    .fi-ta-ctn .fi-ta-records .fi-ta-cell-rental-price .fi-ta-text-item {
+        @apply font-semibold tabular-nums text-white;
+    }
+
+    .fi-ta-ctn .fi-ta-records .fi-ta-cell-created-at .fi-ta-text-item {
+        @apply text-slate-400;
+    }
+
+    .fi-ta-ctn .fi-ta-records .fi-ta-cell-content {
+        @apply text-slate-300;
+    }
+
+    .fi-ta-ctn .fi-ta-records .fi-ta-cell-label {
+        @apply text-slate-400;
+    }
+
+    .fi-ta-ctn .fi-ta-empty-state {
+        @apply border-slate-800;
+    }
+
+    .fi-ta-ctn .fi-ta-empty-state-icon-bg {
+        @apply bg-slate-800;
+    }
+
+    .fi-ta-ctn .fi-ta-empty-state-icon-bg .fi-icon {
+        @apply text-slate-300;
+    }
+
+    .fi-ta-ctn .fi-ta-empty-state-heading {
+        @apply text-slate-100;
+    }
+
+    .fi-ta-ctn .fi-ta-empty-state-description {
+        @apply text-slate-400;
+    }
+
+    .fi-wi-stats-overview-stat {
+        @apply h-full border border-slate-800 bg-gradient-to-br from-slate-900 via-slate-900 to-slate-800 p-5 transition-colors duration-200 dark:ring-slate-800 sm:p-6;
+    }
+
+    .fi-wi-stats-overview .fi-wi-stats-overview-stat:nth-child(1) {
+        @apply border-emerald-900/70;
+    }
+
+    .fi-wi-stats-overview .fi-wi-stats-overview-stat:nth-child(2) {
+        @apply border-sky-900/70;
+    }
+
+    .fi-wi-stats-overview .fi-wi-stats-overview-stat:nth-child(3) {
+        @apply border-amber-900/70;
+    }
+
+    .fi-wi-stats-overview .fi-wi-stats-overview-stat:nth-child(4) {
+        @apply border-rose-900/70;
+    }
+
+    .fi-wi-stats-overview .fi-wi-stats-overview-stat:nth-child(5) {
+        @apply border-emerald-900/70;
+    }
+
+    .fi-wi-stats-overview-stat .fi-wi-stats-overview-stat-label-ctn {
+        @apply flex min-h-10 items-center justify-between gap-3;
+    }
+
+    .fi-wi-stats-overview-stat .fi-wi-stats-overview-stat-label {
+        @apply text-sm font-medium text-slate-300;
+    }
+
+    .fi-wi-stats-overview-stat .fi-wi-stats-overview-stat-label-ctn > .fi-icon {
+        @apply order-2 box-border h-10 w-10 shrink-0 rounded-lg p-2.5;
+    }
+
+    .fi-wi-stats-overview .fi-wi-stats-overview-stat:nth-child(1) .fi-wi-stats-overview-stat-label-ctn > .fi-icon {
+        @apply bg-emerald-950 text-emerald-300;
+    }
+
+    .fi-wi-stats-overview .fi-wi-stats-overview-stat:nth-child(2) .fi-wi-stats-overview-stat-label-ctn > .fi-icon {
+        @apply bg-sky-950 text-sky-300;
+    }
+
+    .fi-wi-stats-overview .fi-wi-stats-overview-stat:nth-child(3) .fi-wi-stats-overview-stat-label-ctn > .fi-icon {
+        @apply bg-amber-950 text-amber-300;
+    }
+
+    .fi-wi-stats-overview .fi-wi-stats-overview-stat:nth-child(4) .fi-wi-stats-overview-stat-label-ctn > .fi-icon {
+        @apply bg-rose-950 text-rose-300;
+    }
+
+    .fi-wi-stats-overview .fi-wi-stats-overview-stat:nth-child(5) .fi-wi-stats-overview-stat-label-ctn > .fi-icon {
+        @apply bg-emerald-950 text-emerald-300;
+    }
+
+    .fi-wi-stats-overview-stat .fi-wi-stats-overview-stat-value,
+    .fi-wi-stats-overview-stat .fi-wi-stats-overview-stat-placeholder {
+        @apply mt-3 text-2xl font-bold tracking-tight text-white sm:text-3xl;
+    }
+
+    .fi-wi-stats-overview-stat .fi-wi-stats-overview-stat-description {
+        @apply text-xs text-slate-400;
+    }
+
+}
