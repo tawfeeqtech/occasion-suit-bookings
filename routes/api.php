@@ -16,6 +16,7 @@ Route::prefix('v1')->middleware('telegram.staff')->group(function () {
 
     // 3. Items inventory lookup
     Route::get('/items', [ItemController::class, 'index'])->name('api.v1.items.index');
+    Route::post('/items', [ItemController::class, 'store'])->name('api.v1.items.store');
 
     // 4. Returns & Collateral
     Route::post('/bookings/{id}/return', [ReturnController::class, 'processReturn'])->name('api.v1.bookings.return');
